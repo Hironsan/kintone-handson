@@ -2,4 +2,4 @@ domain: xxx
 apps:
     test:
         id: xxx
-        token: xxxx
+        token: xxx

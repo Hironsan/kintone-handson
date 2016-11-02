@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
+
 import pykintone
 from pykintone import model
 import pykintone.structure_field as sf
@@ -13,14 +15,17 @@ class BusinessCard(model.kintoneModel):
         self.location = ''
         self.files = [sf.File()]
 
-app = pykintone.load("./config.yaml").app()
-myfiles = ["/Users/smap4/Python/Kintone/image.png"]
 
-card = BusinessCard()
-card.name = 'Hironsan'
-card.company = ''
-card.location = '東京'
-card.files = [sf.File.upload(f, app) for f in myfiles]
-print(card.files)
+def create_card(entities, file_path):
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    conf_path = os.path.join(base_dir, 'config/kintone.yaml')
+    app = pykintone.load(conf_path).app()
 
-result = app.create(card)
+    card = BusinessCard()
+    card.name = entities.get('PERSON', '')
+    card.company = entities.get('ORGANIZATION', '')
+    card.location = entities.get('LOCATION', '')
+    card.files = [sf.File.upload(f, app) for f in [file_path]]
+    result = app.create(card)
+
+    return result
