@@ -8,24 +8,22 @@ import pykintone.structure_field as sf
 
 class BusinessCard(model.kintoneModel):
 
-    def __init__(self):
+    def __init__(self, app, name, company, location, impression, image_path):
         super(BusinessCard, self).__init__()
-        self.name = ''
-        self.company = ''
-        self.location = ''
-        self.files = [sf.File()]
+        self.name = name
+        self.company = company
+        self.location = location
+        self.impression = impression
+        self.image = [sf.File.upload(image_path, app)]
 
 
-def create_card(entities, file_path):
+def create_card(comment, entities, file_path):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     conf_path = os.path.join(base_dir, 'config/kintone.yaml')
     app = pykintone.load(conf_path).app()
 
-    card = BusinessCard()
-    card.name = entities.get('PERSON', '')
-    card.company = entities.get('ORGANIZATION', '')
-    card.location = entities.get('LOCATION', '')
-    card.files = [sf.File.upload(f, app) for f in [file_path]]
+    name, company, location = entities['PERSON'], entities['ORGANIZATION'], entities['LOCATION']
+    card = BusinessCard(app, name, company, location, comment, file_path)
     result = app.create(card)
 
     return result

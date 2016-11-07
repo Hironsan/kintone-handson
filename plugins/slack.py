@@ -4,10 +4,13 @@ import os
 import requests
 from slackbot.bot import respond_to, listen_to
 
-#from ..slackbot_settings import API_TOKEN
-from .apis.vision import detect_text, get_required_entities
-from .apis.language import analyze_entities
+from .apis.vision import detect_text
+from .apis.language import extract_required_entities
 from .apis.kintone import create_card
+from .apis.config_loader import loader
+
+
+BASE_DIR = os.path.dirname(__file__)
 
 
 @respond_to('こんにちは')
@@ -16,11 +19,11 @@ def hello(message):
     message.reply('こんにちは!')
 
 
-def download_image(url):
-    token = os.environ.get('SLACK_API_KEY')
-    resp = requests.get(url, headers={'Authorization': "Bearer " + token})
+def download_image(url, access_token=None):
+    resp = requests.get(url, headers={'Authorization': "Bearer " + access_token})
     if resp.ok:
-        path = os.path.join(os.path.dirname(__file__), "./downloaded.png")
+        file_name = url.split('/')[-1]
+        path = os.path.join(BASE_DIR, file_name)
         with open(path, "wb") as f:
             f.write(resp.content)
             return path
@@ -29,15 +32,17 @@ def download_image(url):
 @listen_to('(.*)')
 def anyone(message, something):
     if 'file' in message.body:
+        slack_token = loader(os.path.join(BASE_DIR, 'config/slack.yaml'))
+        google_token = loader(os.path.join(BASE_DIR, 'config/google.yaml'))
+
         url = message.body['file']['url_private_download']
-        path = download_image(url)
-        text = detect_text(path)
-        entities = analyze_entities(text)
-        import pprint
-        pprint.pprint(entities)
-        entities = get_required_entities(entities)
-        print(entities)
-        create_card(entities, path)
+        img_path = download_image(url, slack_token['token'])
+
+        text = detect_text(img_path, google_token['token'])
+        entities = extract_required_entities(text, google_token['token'])
+
+        comment = message.body['file']['initial_comment']['comment']
+        create_card(comment, entities, img_path)
         message.reply('名刺情報を登録しました。')
     else:
-        message.reply('私はねこが好きです。')
+        message.reply('名刺情報の登録をできますよ。')

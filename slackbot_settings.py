@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import os
+from plugins.apis.config_loader import loader
 
-
-API_TOKEN = os.environ.get('SLACK_API_KEY', '')
+API_TOKEN = loader('plugins/config/slack.yaml')['token']
 
 default_reply = "スイマセン。其ノ言葉ワカリマセン"
 
