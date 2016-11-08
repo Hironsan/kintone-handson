@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
-
 import pykintone
 from pykintone import model
 import pykintone.structure_field as sf
@@ -17,9 +15,7 @@ class BusinessCard(model.kintoneModel):
         self.image = [sf.File.upload(image_path, app)]
 
 
-def create_card(comment, entities, file_path):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    conf_path = os.path.join(base_dir, 'config/kintone.yaml')
+def create_card(comment, entities, file_path, conf_path):
     app = pykintone.load(conf_path).app()
 
     name, company, location = entities['PERSON'], entities['ORGANIZATION'], entities['LOCATION']

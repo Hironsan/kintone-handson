@@ -27,10 +27,11 @@ def download_image(url, access_token=None):
 
 
 @listen_to('(.*)')
-def anyone(message, something):
+def anymessage(message, something):
     if 'file' in message.body:
         slack_token = loader(os.path.join(BASE_DIR, 'config/slack.yaml'))
         google_token = loader(os.path.join(BASE_DIR, 'config/google.yaml'))
+        kintone_conf = os.path.join(BASE_DIR, 'config/kintone.yaml')
 
         url = message.body['file']['url_private_download']
         img_path = download_image(url, slack_token['token'])
@@ -38,7 +39,7 @@ def anyone(message, something):
         entities = extract_entities_from_img(img_path, google_token['token'])
 
         comment = message.body['file']['initial_comment']['comment']
-        create_card(comment, entities, img_path)
+        create_card(comment, entities, img_path, kintone_conf)
         message.reply('名刺情報を登録しました。')
     else:
         message.reply('名刺情報の登録をできますよ。')
