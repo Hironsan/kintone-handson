@@ -4,12 +4,9 @@ import os
 import requests
 from slackbot.bot import respond_to, listen_to
 
-from .apis.vision import detect_text
-from .apis.language import extract_required_entities
+from .apis.integration import extract_entities_from_img
 from .apis.kintone import create_card
 from .apis.config_loader import loader
-
-
 BASE_DIR = os.path.dirname(__file__)
 
 
@@ -38,8 +35,7 @@ def anyone(message, something):
         url = message.body['file']['url_private_download']
         img_path = download_image(url, slack_token['token'])
 
-        text = detect_text(img_path, google_token['token'])
-        entities = extract_required_entities(text, google_token['token'])
+        entities = extract_entities_from_img(img_path, google_token['token'])
 
         comment = message.body['file']['initial_comment']['comment']
         create_card(comment, entities, img_path)
