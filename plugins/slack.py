@@ -29,27 +29,4 @@ def get_user_name(user, token):
         return ''
 
 
-@respond_to('こんにちは')
-@respond_to('今日は')
-def hello(message):
-    message.reply('こんにちは!')
-
-
-@listen_to('(.*)')
-def anymessage(message, something):
-    if 'file' in message.body:
-        slack_token = loader(os.path.join(BASE_DIR, 'config/slack.yaml'))
-        google_token = loader(os.path.join(BASE_DIR, 'config/google.yaml'))
-        kintone_conf = os.path.join(BASE_DIR, 'config/kintone.yaml')
-
-        url = message.body['file']['url_private_download']
-        submitter = get_user_name(message.body['user'], slack_token['token'])
-        img_path = download_image(url, slack_token['token'])
-
-        entities = extract_entities_from_img(img_path, google_token['token'])
-
-        comment = message.body['file']['initial_comment']['comment']
-        create_card(comment, entities, img_path, submitter, kintone_conf)
-        message.reply('名刺情報を登録しました。')
-    else:
-        message.reply('名刺情報の登録をできますよ。')
+# Write your code
