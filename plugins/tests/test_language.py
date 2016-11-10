@@ -15,6 +15,6 @@ if __name__ == '__main__':
 
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     google_token = loader(os.path.join(BASE_DIR, 'config/google.yaml'))
-    text = open(args.text_file).read()
+    text = open(args.text_file, encoding="utf-8").read()
     entities = extract_required_entities(text, google_token['token'])
     print(entities)

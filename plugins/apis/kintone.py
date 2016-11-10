@@ -23,4 +23,7 @@ def create_card(comment, entities, file_path, submitter, conf_path):
     card = BusinessCard(app, name, company, location, comment, submitter, file_path)
     result = app.create(card)
 
-    return result
+    if result.ok:
+        return result
+    else:
+        print(result.error)
